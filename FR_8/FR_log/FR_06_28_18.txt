@@ -1,0 +1,18 @@
+13:56:24 - FR_BEGIN_DOC. Ошибка установки режима FR_SetMode(,1)-3822
+13:56:24 - FR_CANCEL_DOC - Ошибка CancelCheck()-16
+13:59:02 - FR_BEGIN_DOC. Ошибка установки режима FR_SetMode(,1)-3822
+13:59:02 - FR_CANCEL_DOC - Ошибка CancelCheck()-16
+14:08:25 - FR_BEGIN_DOC. Ошибка установки режима FR_SetMode(,1)-3822
+14:08:25 - FR_CANCEL_DOC - Ошибка CancelCheck()-16
+14:08:36 - FR_CANCEL_DOC - Ошибка CancelCheck()-16
+14:09:36 - 1
+14:15:57 - FR_BEGIN_DOC
+14:15:57 - FR_BODY_DOC
+14:15:57 - FR_BODY_DOC
+14:15:58 - FR_CLOSE_DOC
+14:16:19 - FR_CashInc
+14:16:29 - FR_CashOut
+14:16:32 - FR_CashOut
+14:16:43 - FR_X
+14:27:00 - FR_X
+14:59:08 - DESKTOP-AR4VCTO # alex - FR_X

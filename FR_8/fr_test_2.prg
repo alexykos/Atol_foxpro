@@ -1,0 +1,124 @@
+
+
+lcQPay = SYS(2015)
+CREATE CURSOR (lcQPay) (type i,summ Y)
+
+INSERT INTO (lcQPay)(type ,summ ) ;
+VALUES(1, NTOM(50))
+INSERT INTO (lcQPay)(type ,summ ) ;
+VALUES(2, NTOM(40))
+INSERT INTO (lcQPay)(type ,summ ) ;
+VALUES(3, NTOM(20))
+INSERT INTO (lcQPay)(type ,summ ) ;
+VALUES(4, NTOM(10))
+
+
+
+  ECR = CreateObject("AddIn.FprnM45") 
+  
+* занимаем порт
+  ECR.DeviceEnabled = .T.
+  If ECR.ResultCode <> 0 Then
+    Return
+  ENDIF
+  
+  * если есть открытый чек, то отменяем его
+  If ECR.CheckState <> 0 Then
+    If ECR.CancelCheck <> 0 Then
+      Return
+    EndIf
+  ENDIF
+  
+  ECR.NewDocument() 
+
+* входим в режим регистрации
+  * устанавливаем пароль кассира
+  ECR.Password = "1"
+  * входим в режим регистрации
+  ECR.Mode = 1
+  If ECR.SetMode <> 0 Then
+    Return
+  EndIf
+
+
+  ECR.AttrNumber = 1021  
+  ECR.AttrValue = "Самый Старший по ФР Костин А.А."  
+  ECR.WriteAttribute()  
+
+ECR.CheckType = 1  
+  *!*	  // CheckMode - Режим формирования чека:  
+  *!*	  // 	0 - только в электронном виде без печати на чековой ленте  
+  *!*	  // 	1 - печатать на чековой ленте  
+  ECR.CheckMode = 1  
+  ECR.OpenCheck()  
+    
+  *!*	  // Применяемая система налогооблажения в чеке:  
+  *!*	  // 	ОСН - 1  
+  *!*	  // 	УСН доход - 2  
+  *!*	  // 	УСН доход-расход - 4  
+  *!*	  // 	ЕНВД - 8  
+  *!*	  // 	ЕСН - 16  
+  *!*	  // 	ПСН - 32  
+  ECR.AttrNumber = 1055  
+  ECR.AttrValue = 4  
+  ECR.WriteAttribute()  
+
+
+
+* продажа без сдачи
+  * регистрация продажи
+  ECR.Name = "Молоко"
+  ECR.Price = 20
+  ECR.Quantity = 1
+  ECR.Department = 2
+  If ECR.Registration <> 0 Then
+    Return
+  EndIf
+
+
+
+
+
+ ECR.AttrNumber = 1055  
+  ECR.AttrValue = 1  
+  ECR.WriteAttribute()  
+  
+  * регистрация продажи
+  ECR.Name = "Фанта"
+  ECR.Price = 20
+  ECR.Quantity = 5
+  ECR.Department = 1
+  If ECR.Registration <> 0 Then
+    Return
+  EndIf
+
+ ECR.AttrNumber = 1055  
+  ECR.AttrValue = 4  
+  ECR.WriteAttribute()  
+
+  * закрытие чека наличными без ввода полученной от клиента суммы
+ 
+ SELECT (lcQPay)
+ GO TOP 
+ DO WHILE !EOF(lcQPay)
+ 	ECR.SUMM 		= EVALUATE(lcQPay + '.summ')
+	ECR.TypeClose 	= EVALUATE(lcQPay + '.type')
+	ECR.PAYMENT()
+ SKIP IN (lcQPay)
+ ENDDO 
+  
+  
+  If ECR.CloseCheck <> 0 Then
+    Return
+  ENDIF
+  
+  * выходим в режим выбора, чтобы кто-то под введенными паролями не сделал что нибуть нехорошее
+  If ECR.ResetMode <> 0 Then
+    Return
+  EndIf
+  
+  * освобождаем порт
+  ECR.DeviceEnabled = .F.
+  If ECR.ResultCode <> 0 Then
+    Return
+  EndIf

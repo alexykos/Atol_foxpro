@@ -1,0 +1,5 @@
+15:21:14 - DESKTOP-AR4VCTO # alex - FR_BEGIN_DOC
+15:21:14 - DESKTOP-AR4VCTO # alex - FR_BEGIN_DOC. Ошибка установки режима FR_SetMode(,1)-3822
+15:21:14 - DESKTOP-AR4VCTO # alex - FR_CANCEL_DOC
+15:21:14 - DESKTOP-AR4VCTO # alex - FR_CANCEL_DOC - Ошибка CancelCheck()-16
+15:21:41 - DESKTOP-AR4VCTO # alex - FR_Z

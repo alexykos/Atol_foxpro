@@ -1,0 +1,225 @@
+* занимаем порт
+  ECR.DeviceEnabled = .T.
+  If ECR.ResultCode <> 0 Then
+    Return
+  EndIf
+
+* получаем состояние ККМ
+  If ECR.GetStatus <> 0 Then
+    Return
+  EndIf
+
+* проверяем на всякий случай ККМ на фискализированность
+  If ECR.Fiscal Then
+    If MessageBox("ККМ фискализирована! Вы действительно хотите продолжить?", 32 + 4) = 7 Then
+      Return
+    EndIf
+  EndIf
+
+* если есть открытый чек, то отменяем его
+  If ECR.CheckState <> 0 Then
+    If ECR.CancelCheck <> 0 Then
+      Return
+    EndIf
+  EndIf
+
+* если смена открыта снимаем Z-отчет
+  If ECR.SessionOpened Then
+    * устанавливаем пароль системного администратора ККМ
+    ECR.Password = "30"
+    * входим в режим отчетов с гашением
+    ECR.Mode = 3
+    If ECR.SetMode <> 0 Then
+      Return
+    EndIf
+    * снимаем отчет
+    ECR.ReportType = 1
+    If ECR.Report <> 0 Then
+      Return
+    EndIf
+  EndIf
+
+* входим в режим регистрации
+  * устанавливаем пароль кассира
+  ECR.Password = "1"
+  * входим в режим регистрации
+  ECR.Mode = 1
+  If ECR.SetMode <> 0 Then
+    Return
+  EndIf
+
+* продажа без сдачи
+  * регистрация продажи
+  ECR.Name = "Молоко"
+  ECR.Price = 10.45
+  ECR.Quantity = 1
+  ECR.Department = 2
+  If ECR.Registration <> 0 Then
+    Return
+  EndIf
+  * скидка суммой на предыдущую позицию
+  ECR.Percents = 10
+  ECR.Destination = 1
+  If ECR.PercentsDiscount <> 0 Then
+    Return
+  EndIf
+  * регистрация продажи
+  ECR.Name = "Фанта"
+  ECR.Price = 25
+  ECR.Quantity = 5
+  ECR.Department = 1
+  If ECR.Registration <> 0 Then
+    Return
+  EndIf
+  * скидка суммой на весь чек
+  ECR.Summ = 10.4
+  ECR.Destination = 0
+  If ECR.SummDiscount <> 0 Then
+    Return
+  EndIf
+  * закрытие чека наличными без ввода полученной от клиента суммы
+  ECR.TypeClose = 0
+  If ECR.CloseCheck <> 0 Then
+    Return
+  EndIf
+
+* продажа со сдачей
+  * регистрация продажи
+  ECR.Name = "Молоко"
+  ECR.Price = 10.45
+  ECR.Quantity = 1
+  ECR.Department = 2
+  If ECR.Registration <> 0 Then
+    Return
+  EndIf
+  * регистрация продажи
+  ECR.Name = "Пепси-кола"
+  ECR.Price = 25
+  ECR.Quantity = 5
+  ECR.Department = 1
+  If ECR.Registration <> 0 Then
+    Return
+  EndIf
+  * сторно предыдущей регистрации
+  If ECR.Storno <> 0 Then
+    Return
+  EndIf
+  * регистрация продажи
+  ECR.Name = "Фанта"
+  ECR.Price = 25
+  ECR.Quantity = 5
+  ECR.Department = 1
+  If ECR.Registration <> 0 Then
+    Return
+  EndIf
+  * скидка суммой на весь чек
+  ECR.Summ = 50
+  ECR.Destination = 0
+  If ECR.SummDiscount <> 0 Then
+    Return
+  EndIf
+  * закрытие чека наличными с вводом полученной от клиента суммы
+  ECR.Summ = 100
+  ECR.TypeClose = 0
+  If ECR.Delivery <> 0 Then
+    Return
+  EndIf
+
+* аннулирование
+  * регистрация аннулирования
+  ECR.Name = "Dirol"
+  ECR.Price = 7
+  ECR.Quantity = 1
+  If ECR.Annulate <> 0 Then
+    Return
+  EndIf
+  * регистрация аннулирования
+  ECR.Name = "Orbit"
+  ECR.Price = 8
+  ECR.Quantity = 2
+  If ECR.Annulate <> 0 Then
+    Return
+  EndIf
+  * закрытие чека
+  ECR.TypeClose = 0
+  If ECR.CloseCheck <> 0 Then
+    Return
+  EndIf
+
+* возврат
+  * регистрация возврата
+  ECR.Name = "Молоко"
+  ECR.Price = 10.45
+  ECR.Quantity = 1
+  If ECR.Return <> 0 Then
+    Return
+  EndIf
+  * регистрация возврата
+  ECR.Name = "Колбаса"
+  ECR.Price = 99.99
+  ECR.Quantity = 1.235
+  If ECR.Return <> 0 Then
+    Return
+  EndIf
+  * скидка суммой на весь чек
+  ECR.Summ = 50
+  ECR.Destination = 0
+  If ECR.SummDiscount <> 0 Then
+    Return
+  EndIf
+  * закрытие чека
+  ECR.TypeClose = 0
+  If ECR.CloseCheck <> 0 Then
+    Return
+  EndIf
+
+* внесение наличности
+  ECR.Summ = 400.5
+  If ECR.CashIncome <> 0 Then
+    Return
+  EndIf
+
+* выплата наличности
+  ECR.Summ = 121.34
+  If ECR.CashOutcome <> 0 Then
+    Return
+  EndIf
+
+* X - отчет
+  * устанавливаем пароль администратора ККМ
+  ECR.Password = "29"
+  * входим в режим отчетов без гашения
+  ECR.Mode = 2
+  If ECR.SetMode <> 0 Then
+    Return
+  EndIf
+  * снимаем отчет
+  ECR.ReportType = 2
+  If ECR.Report <> 0 Then
+    Return
+  EndIf
+
+*!*	* Z - отчет
+*!*	  * устанавливаем пароль системного администратора ККМ
+*!*	  ECR.Password = "30"
+*!*	  * входим в режим отчетов с гашением
+*!*	  ECR.Mode = 3
+*!*	  If ECR.SetMode <> 0 Then
+*!*	    Return
+*!*	  EndIf
+*!*	  * снимаем отчет
+*!*	  ECR.ReportType = 1
+*!*	  If ECR.Report <> 0 Then
+*!*	    Return
+*!*	  EndIf
+
+* выходим в режим выбора, чтобы кто-то под введенными паролями не сделал что нибуть нехорошее
+  If ECR.ResetMode <> 0 Then
+    Return
+  EndIf
+
+* освобождаем порт
+  ECR.DeviceEnabled = .F.
+  If ECR.ResultCode <> 0 Then
+    Return
+  EndIf
